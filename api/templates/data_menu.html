@@ -1,0 +1,123 @@
+{% extends 'index.html' %}
+
+{% block content %}
+
+<div class="container-sm">
+    <h4>MENU</h4>           <br> <hr>
+
+    <strong><p>Uploaded data</p></strong>    <br>
+
+    <div id="map">
+        <div id="zoom_to_points">BOUNDING BOX</div>
+    </div>    <br>
+
+    <form method="post" class="row g-2 align-items-end">
+        <div class="col-auto">
+            <label for="dropdown" class="form-label"><strong>Select a new data format</strong></label>
+            <select class="form-select" id="dropdown" name="dropdown">
+                <option value="geojson">GEOJSON</option>
+                <option value="shapefile">SHAPEFILE</option>
+                <option value="kml">KML</option>
+            </select>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">DOWNLOAD</button>
+        </div>
+    </form> 
+    
+    <br> <br>
+
+
+    {% if df %}
+    <div style="overflow:auto;">
+        {{ df | safe }}
+    </div>
+
+
+    {% else %}
+        <p>Data not valid</p>
+    {% endif %}
+</div>
+
+    
+{% endblock content %}
+
+
+
+{% block script %}
+
+<script>
+    var coordinates = JSON.parse('{{ coordinates | tojson | safe | replace("\'", "\\\'") }}');
+    var coordinates = coordinates['coordinates'];
+
+    var map = L.map('map');
+
+    var Thunderforest_Outdoors = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        });
+    Thunderforest_Outdoors.addTo(map);
+
+    var markerClusterGroup = L.markerClusterGroup();
+
+    var markers_list = {};
+    
+    coordinates.forEach(function (marker, index) {
+        var leafletMarker = L.circleMarker(marker,{
+            radius: 10,
+            color: '#CCF381',
+            fillColor: '#4831D4',
+            fillOpacity: 0.80
+       });
+        leafletMarker.on('click', function(e) {
+            map.flyTo(e.latlng,14, {
+                    duration: 3
+            });
+        });
+       markers_list[index] = leafletMarker;
+       markerClusterGroup.addLayer(leafletMarker);
+    });
+
+    map.addLayer(markerClusterGroup);
+    map.fitBounds(markerClusterGroup.getBounds());
+
+
+    // zoom button
+    var map_center = map.getCenter();
+    var element = document.getElementById('zoom_to_points');
+    element.addEventListener("click", function(e) {
+        map.fitBounds(markerClusterGroup.getBounds());
+    }, false);
+
+
+    var table = document.getElementsByTagName('table')[0];
+    var rows = table.getElementsByTagName("tr");
+    for (i = 0; i < rows.length; i++) {
+        // adding style to the tr | had issues with doing that in CSS pehaps becausue it is df.to_html()
+        if (i >0){
+            table.rows[i].style.cursor = "pointer";
+        };
+        var currentRow = table.rows[i];
+        var createClickHandler = function(row) {
+            return function() {
+                var cell = row.getElementsByTagName("th")[0];
+                var id = cell.innerHTML;
+                console.log(id);
+                
+                //map.setView(markers_list[id -1].getLatLng(), 15);
+
+                map.flyTo(markers_list[id].getLatLng(),14, {
+                        duration: 3
+                 });
+            };
+        };
+        currentRow.onclick = createClickHandler(currentRow);
+    }
+
+  
+
+  
+
+    
+</script>
+    
+{% endblock script %}

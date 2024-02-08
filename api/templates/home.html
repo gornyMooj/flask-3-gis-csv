@@ -1,0 +1,36 @@
+{# home.html #}
+
+{% extends 'index.html' %}
+
+{% block content %}
+
+    <div class="container-sm">
+        <h3>Provide the csv to get back spatial data</h3>
+        <h5>&#128161; I don't save files on the server</h5>
+        <p><u>How it works:</u></p>
+        <ul>
+            <li>upload a csv file with coordinates broken down into 'X' and 'Y' columns.</li>
+            <li>it is assumed that the points that you are uploading are in the EPSG:4326 coordinate system</li>
+            <li>select the desired data format</li>
+            <li>click "Download" to download the data in the selected format</li>
+        </ul>
+        <br>
+        <p><u>The app utilises the following tools:</u></p>
+        <ul>
+            <li>Flask</li>
+            <li>Pandas</li>
+            <li>Geopandas</li>
+            <li>Liflet</li>
+        </ul>
+        <br>
+
+        <p><a href="https://gornymooj.github.io/get-coordinates-leaflet//latlong-viewer.html" target="_blank">&#127757;Here</a> is a map viewer you can use to quickly generate a CSV file of points.</p>
+
+        <br>
+        
+        <a class="btn btn-primary" href="{{url_for('upload_data')}}" role="button">Let's get started</a>
+
+        <hr>
+    </div>
+    
+{% endblock content %}

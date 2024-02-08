@@ -1,0 +1,33 @@
+{% extends 'index.html' %}
+
+{% block content %}
+
+
+<div class="container-sm">
+    {% for message in get_flashed_messages() %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <strong>{{ message }}</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+
+    <h5>UPLOADER</h5> <br>
+
+    <form method="post" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="file" class="form-label">Choose a CSV file</label>
+            <input class="form-control" type="file" id="file" name="file" accept=".csv">
+        </div>
+        <input type = "submit" value="Upload" class="btn btn-lg btn-outline-primary">
+    </form>
+
+    {% if error %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+    {% endif %}
+
+</div>
+
+    
+{% endblock content %}
